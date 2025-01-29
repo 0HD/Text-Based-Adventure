@@ -11,17 +11,15 @@ import google.generativeai as genai
 
 genai.configure(api_key=os.getenv("GEMINI_KEY"))
 
-generation_config = {
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "top_k": 64,
-    "max_output_tokens": 65536,
-    "response_mime_type": "text/plain"
-}
-
 def create_model(
         model = "gemini-2.0-flash-exp",
-        generation_config = generation_config,
+        generation_config = {
+            "temperature": 0.7,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 65536,
+            "response_mime_type": "text/plain"
+        },
         system_prompt = "You are a helpful assistant."
 ):
     model = genai.GenerativeModel(
@@ -39,15 +37,21 @@ def send_message(prompt:str, chat_session = create_chat()):
     return chat_session.send_message(prompt)
 
 class Model():
-    def __init__(self, model_name = None, chat = []):
-        self.config = generation_config
+    def __init__(self, model_name = None, history = []):
+        self.config = {
+            "temperature": 0.7,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 65536,
+            "response_mime_type": "text/plain"
+        }
         if model_name == None:
             self.model_name = "gemini-2.0-flash-exp"
         else:
             self.model_name = model_name
         self.system_prompt = "You are a helpful assistant."
         self.model = create_model(self.model_name, self.config, self.system_prompt)
-        self.chat = create_chat(self.model, chat)
+        self.chat = create_chat(self.model, history)
 
     def get_streamed_response(self, prompt:str):
         response = self.chat.send_message(prompt, stream=True)
