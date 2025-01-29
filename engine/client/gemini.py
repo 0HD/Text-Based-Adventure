@@ -30,11 +30,11 @@ def create_model(
 
     return model
 
-def create_chat(model = create_model(), history = []):
-    return model.start_chat(history=history)
+def create_chat(model = create_model(), new_history = []):
+    return model.start_chat(history=new_history)
 
-def send_message(prompt:str, chat_session = create_chat()):
-    return chat_session.send_message(prompt)
+def send_message(prompt:str, chat_session = create_chat(), stream = True):
+    return chat_session.send_message(prompt, stream=stream)
 
 class Model():
     def __init__(self, model_name = None, history = []):
@@ -54,7 +54,7 @@ class Model():
         self.chat = create_chat(self.model, history)
 
     def get_streamed_response(self, prompt:str):
-        response = self.chat.send_message(prompt, stream=True)
+        response = send_message(prompt, self.chat, stream=True)
         from random import randint
         from time import sleep
 
@@ -80,7 +80,8 @@ class Model():
         if stream:
             return self.get_streamed_response(prompt)
         else:
-            response = self.chat.send_message(prompt, stream=False)
+            # response = send_message(prompt, self.chat, stream=False)
+            response = self.chat.send_message(prompt, stream = False)
             return response.text
     
     def update_model(self):
